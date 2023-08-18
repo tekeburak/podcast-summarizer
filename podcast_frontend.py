@@ -60,15 +60,18 @@ def main():
     url = st.sidebar.text_input("Link to RSS Feed")
 
     process_button = st.sidebar.button("Process Podcast Feed")
-    st.sidebar.markdown("**Note**: Podcast processing can take upto 5 mins, please be patient.")
+    st.sidebar.markdown("**Note**: Podcast processing won't take upto 5 mins, because this project is using whisperX model.")
 
     if process_button:
-
+        
+        # Clear
+        st.empty()
+        
         # Call the function to process the URLs and retrieve podcast guest information
         podcast_info = process_podcast_info(url)
 
         # Right section - Newsletter content
-        st.header("Newsletter Content")
+        st.header(podcast_info['podcast_details']['podcast_title'])
 
         # Display the podcast title
         st.subheader("Episode Title")
@@ -90,11 +93,11 @@ def main():
 
         with col3:
             st.subheader("Podcast Guest")
-            st.write(podcast_info['podcast_guest']['name'])
+            st.write(podcast_info['podcast_guest']['name'] + ',' + podcast_info['podcast_guest']['job'])
 
         with col4:
             st.subheader("Podcast Guest Details")
-            st.write(podcast_info["podcast_guest"]['summary'])
+            st.write(podcast_info["podcast_guest"]['summary'] + " " + podcast_info["podcast_guest"]['URL'])
 
         # Display the five key moments
         st.subheader("Key Moments")
