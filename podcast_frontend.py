@@ -42,17 +42,18 @@ def main():
 
         with col3:
             st.subheader("Podcast Guest")
-            st.write(podcast_info['podcast_guest']['name'])
+            st.write(podcast_info['podcast_guest']['name'] + ',' + podcast_info['podcast_guest']['job'])
 
         with col4:
             st.subheader("Podcast Guest Details")
-            st.write(podcast_info["podcast_guest"]['summary'])
+            st.write(podcast_info["podcast_guest"]['summary'] + " " + podcast_info["podcast_guest"]['URL'])
 
-        # Display the three key moments
+        # Display the five key moments
         st.subheader("Key Moments")
         key_moments = podcast_info['podcast_highlights']
-        st.markdown(
-                f"<p style='margin-bottom: 5px;'>{key_moments}</p>", unsafe_allow_html=True)
+        for moment in key_moments.split('\n'):
+            st.markdown(
+                f"<p style='margin-bottom: 5px;'>{moment}</p>", unsafe_allow_html=True)
 
     # User Input box
     st.sidebar.subheader("Add and Process New Podcast Feed")
@@ -118,7 +119,7 @@ def create_dict_from_json_files(folder_path):
 
 def process_podcast_info(url):
     f = modal.Function.lookup("corise-podcast-project", "process_podcast")
-    output = f.call(url, '/content/podcast/')
+    output = f.call(url, '/tmp/podcast/')
     return output
 
 if __name__ == '__main__':
