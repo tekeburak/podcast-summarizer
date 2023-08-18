@@ -4,7 +4,7 @@ import json
 import os
 
 def main():
-    st.title("Newsletter Dashboard")
+    st.title("Podcast Summarizer Uplimit")
 
     available_podcast_info = create_dict_from_json_files('.')
 
@@ -20,7 +20,7 @@ def main():
         podcast_info = available_podcast_info[selected_podcast]
 
         # Right section - Newsletter content
-        st.header("Newsletter Content")
+        st.header(podcast_info['podcast_details']['podcast_title'])
 
         # Display the podcast title
         st.subheader("Episode Title")
