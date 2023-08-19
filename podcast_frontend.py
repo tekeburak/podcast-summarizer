@@ -5,10 +5,10 @@ import os
 import base64
 
 def main():
-    
+        
     # Set a background image
     set_png_as_page_bg('background_image.png')
-    
+
     st.title("Podcast Summarizer Uplimit")
 
     available_podcast_info = create_dict_from_json_files('.')
@@ -18,7 +18,14 @@ def main():
 
     # Dropdown box
     st.sidebar.subheader("Available Podcasts Feeds")
-    selected_podcast = st.sidebar.selectbox("Select Podcast", options=available_podcast_info.keys())
+    
+    # Get the list of available podcasts after updating
+    updated_dropdown_list = list(available_podcast_info.keys())
+    # Set the selected index to the index of the last podcast
+    selected_podcast_index = len(updated_dropdown_list) - 1
+    
+    selected_podcast = st.sidebar.selectbox("Select Podcast", options=available_podcast_info.keys(),
+                                            index=selected_podcast_index)
 
     if selected_podcast:
 
@@ -65,51 +72,15 @@ def main():
     url = st.sidebar.text_input("Link to RSS Feed")
 
     process_button = st.sidebar.button("Process Podcast Feed")
-    st.sidebar.markdown("**Note**: Podcast processing won't take upto 5 mins, because this project is using whisperX model.")
+    st.sidebar.markdown("**Note**: 30 minutes Podcast processing takes around a minute, \
+                        because this project is using a 70x faster whisperX model. \
+                        After processing the podcast, the select box will be updated immediately, \
+                        following that, summary of the processed podcast will be shown.")
 
     if process_button:
         
-        # Clear the previous content
-        st.empty()
-        
         # Call the function to process the URLs and retrieve podcast guest information
         podcast_info = process_podcast_info(url)
-
-        # Right section - Newsletter content
-        st.header(podcast_info['podcast_details']['podcast_title'])
-
-        # Display the podcast title
-        st.subheader("Episode Title")
-        st.write(podcast_info['podcast_details']['episode_title'])
-
-        # Display the podcast summary and the cover image in a side-by-side layout
-        col1, col2 = st.columns([7, 3])
-
-        with col1:
-            # Display the podcast episode summary
-            st.subheader("Podcast Episode Summary")
-            st.write(podcast_info['podcast_summary'])
-
-        with col2:
-            st.image(podcast_info['podcast_details']['episode_image'], caption="Podcast Cover", width=300, use_column_width=True)
-
-        # Display the podcast guest and their details in a side-by-side layout
-        col3, col4 = st.columns([3, 7])
-
-        with col3:
-            st.subheader("Podcast Guest")
-            st.write(podcast_info['podcast_guest']['name'] + ',' + podcast_info['podcast_guest']['job'])
-
-        with col4:
-            st.subheader("Podcast Guest Details")
-            st.write(podcast_info["podcast_guest"]['summary'] + " " + podcast_info["podcast_guest"]['URL'])
-
-        # Display the five key moments
-        st.subheader("Key Moments")
-        key_moments = podcast_info['podcast_highlights']
-        for moment in key_moments.split('\n'):
-            st.markdown(
-                f"<p style='margin-bottom: 5px;'>{moment}</p>", unsafe_allow_html=True)
             
         # Update the dropdown with the processed podcast title
         new_podcast_name = get_next_available_name(available_podcast_info)
@@ -120,6 +91,15 @@ def main():
         save_path = os.path.join('.', new_podcast_name)
         with open(save_path, 'w') as json_file:
             json.dump(podcast_info, json_file, indent=4)
+            
+        # Get the list of available podcasts after updating
+        updated_dropdown_list = list(available_podcast_info.keys())
+        
+        # Set the selected index to the index of the last podcast
+        selected_podcast_index = len(updated_dropdown_list) - 1
+            
+        # Clear the previous content by rerendering the main() function
+        st.experimental_rerun()
 
 def create_dict_from_json_files(folder_path):
     json_files = [f for f in os.listdir(folder_path) if f.endswith('.json')]
@@ -141,9 +121,7 @@ def process_podcast_info(url):
     return output
 
 def get_next_available_name(existing_podcasts):
-    idx = 1
-    while f"podcast-{idx}.json" in existing_podcasts:
-        idx += 1
+    idx = len(existing_podcasts.keys()) + 1
     return f"podcast-{idx}.json"
 
 @st.cache_data()
