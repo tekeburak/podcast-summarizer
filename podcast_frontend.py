@@ -2,8 +2,13 @@ import streamlit as st
 import modal
 import json
 import os
+import base64
 
 def main():
+    
+    # Set a background image
+    set_png_as_page_bg('background_image.png')
+    
     st.title("Podcast Summarizer Uplimit")
 
     available_podcast_info = create_dict_from_json_files('.')
@@ -65,7 +70,7 @@ def main():
     if process_button:
         
         # Clear the previous content
-        st.sidebar.empty()
+        st.empty()
         
         # Call the function to process the URLs and retrieve podcast guest information
         podcast_info = process_podcast_info(url)
@@ -140,6 +145,25 @@ def get_next_available_name(existing_podcasts):
     while f"podcast-{idx}.json" in existing_podcasts:
         idx += 1
     return f"podcast-{idx}.json"
+
+@st.cache_data()
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+def set_png_as_page_bg(png_file):
+    bin_str = get_base64_of_bin_file(png_file)
+    page_bg_img = '''
+    <style>
+    .stApp {
+    background-image: url("data:image/png;base64,%s");
+    background-size: cover;
+    opacity: 0.8;  /* Adjust opacity as needed */
+    }
+    </style>
+    ''' % bin_str
+    st.markdown(page_bg_img, unsafe_allow_html=True)
 
 if __name__ == '__main__':
     main()
