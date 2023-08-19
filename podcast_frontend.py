@@ -64,8 +64,8 @@ def main():
 
     if process_button:
         
-        # Clear
-        st.empty()
+        # Clear the previous content
+        st.sidebar.empty()
         
         # Call the function to process the URLs and retrieve podcast guest information
         podcast_info = process_podcast_info(url)
