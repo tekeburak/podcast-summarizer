@@ -105,6 +105,16 @@ def main():
         for moment in key_moments.split('\n'):
             st.markdown(
                 f"<p style='margin-bottom: 5px;'>{moment}</p>", unsafe_allow_html=True)
+            
+        # Update the dropdown with the processed podcast title
+        new_podcast_name = get_next_available_name(available_podcast_info)
+        available_podcast_info[new_podcast_name] = podcast_info
+        selected_podcast = new_podcast_name
+
+        # Save processed podcast info to a JSON file
+        save_path = os.path.join('.', new_podcast_name)
+        with open(save_path, 'w') as json_file:
+            json.dump(podcast_info, json_file, indent=4)
 
 def create_dict_from_json_files(folder_path):
     json_files = [f for f in os.listdir(folder_path) if f.endswith('.json')]
@@ -124,6 +134,12 @@ def process_podcast_info(url):
     f = modal.Function.lookup("corise-podcast-project", "process_podcast")
     output = f.call(url, '/tmp/podcast/')
     return output
+
+def get_next_available_name(existing_podcasts):
+    idx = 1
+    while f"podcast-{idx}.json" in existing_podcasts:
+        idx += 1
+    return f"podcast-{idx}.json"
 
 if __name__ == '__main__':
     main()
