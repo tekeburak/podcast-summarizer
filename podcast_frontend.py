@@ -7,7 +7,7 @@ import base64
 def main():
         
     # Set a background image
-    set_png_as_page_bg('background_image.png')
+    set_png_as_page_bg('background_image.jpg')
 
     st.title("Podcast Summarizer Uplimit")
 
@@ -91,12 +91,6 @@ def main():
         save_path = os.path.join('.', new_podcast_name)
         with open(save_path, 'w') as json_file:
             json.dump(podcast_info, json_file, indent=4)
-            
-        # Get the list of available podcasts after updating
-        updated_dropdown_list = list(available_podcast_info.keys())
-        
-        # Set the selected index to the index of the last podcast
-        selected_podcast_index = len(updated_dropdown_list) - 1
             
         # Clear the previous content by rerendering the main() function
         st.experimental_rerun()
