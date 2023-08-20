@@ -97,6 +97,7 @@ def main():
 
 def create_dict_from_json_files(folder_path):
     json_files = [f for f in os.listdir(folder_path) if f.endswith('.json')]
+    json_files = sorted(json_files)
     data_dict = {}
 
     for file_name in json_files:
