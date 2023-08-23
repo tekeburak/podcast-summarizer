@@ -88,7 +88,7 @@ def main():
         selected_podcast = new_podcast_name
 
         # Save processed podcast info to a JSON file
-        save_path = os.path.join('.', new_podcast_name)
+        save_path = os.path.join('content', new_podcast_name)
         with open(save_path, 'w') as json_file:
             json.dump(podcast_info, json_file, indent=4)
             
