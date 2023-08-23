@@ -4,7 +4,7 @@ Welcome to the Podcast Summarizer project! This tool allows you to automatically
 
 ## Project Demo GIF
 
-![Project Demo GIF](demo.gif)
+![](https://github.com/tekeburak/podcast-summarizer/blob/main/content/podcast/podcast.gif)
 
 ## Demo
 
