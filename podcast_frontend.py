@@ -9,7 +9,7 @@ def main():
     # Set a background image
     set_png_as_page_bg('content/background_image.jpg')
 
-    st.title("Podcast Summarizer Uplimit")
+    st.title("Podcast Summarizer")
 
     available_podcast_info = create_dict_from_json_files('content')
 
