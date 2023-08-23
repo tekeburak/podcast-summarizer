@@ -4,7 +4,9 @@ Welcome to the Podcast Summarizer project! This tool allows you to automatically
 
 ## Project Demo GIF
 
-![](content/podcast/podcast.gif)
+<div align="center">
+   <img src="content/podcast/podcast.gif" width="640" height="360"/>
+</div>
 
 ## Demo
 
