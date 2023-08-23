@@ -5,7 +5,7 @@ Welcome to the Podcast Summarizer project! This tool allows you to automatically
 ## Project Demo GIF
 
 <div align="center">
-   <img src="content/podcast/podcast.gif" width="640" height="360"/>
+   <img src="content/podcast/podcast.gif" width="800" height="450"/>
 </div>
 
 ## Demo
@@ -51,7 +51,7 @@ To run this project locally, follow these steps:
 
 4. Run the Streamlit app:
    ```bash
-   streamlit run app.py
+   streamlit run podcast_frontend.py
 
 ### Local Usage
 
