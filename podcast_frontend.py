@@ -7,11 +7,11 @@ import base64
 def main():
         
     # Set a background image
-    set_png_as_page_bg('background_image.jpg')
+    set_png_as_page_bg('content/background_image.jpg')
 
     st.title("Podcast Summarizer Uplimit")
 
-    available_podcast_info = create_dict_from_json_files('.')
+    available_podcast_info = create_dict_from_json_files('content')
 
     # Left section - Input fields
     st.sidebar.header("Podcast RSS Feeds")
