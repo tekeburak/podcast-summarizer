@@ -54,11 +54,21 @@ def main():
 
         with col3:
             st.subheader("Podcast Guest")
-            st.write(podcast_info['podcast_guest']['name'] + ',' + podcast_info['podcast_guest']['job'])
+            if podcast_info['podcast_guest']['wiki_img'] != "":
+                st.image(podcast_info['podcast_guest']['wiki_img'], \
+                    caption=podcast_info['podcast_guest']['name'] + ',' + \
+                    podcast_info['podcast_guest']['job'], width=300, use_column_width="auto")
+            else:
+                st.write(podcast_info['podcast_guest']['name'] + ',' + podcast_info['podcast_guest']['job'])
 
         with col4:
             st.subheader("Podcast Guest Details")
-            st.write(podcast_info["podcast_guest"]['summary'] + " " + podcast_info["podcast_guest"]['URL'])
+            guest_details_text = podcast_info['podcast_guest']['wiki_title'] + " " + \
+                                 podcast_info['podcast_guest']['wiki_summary'] + " " + \
+                                 podcast_info['podcast_guest']['wiki_url'] + " " + \
+                                 podcast_info['podcast_guest']['google_URL']
+                                 
+            st.write(guest_details_text)
 
         # Display the five key moments
         st.subheader("Key Moments")
@@ -71,16 +81,25 @@ def main():
     st.sidebar.subheader("Add and Process New Podcast Feed")
     url = st.sidebar.text_input("Link to RSS Feed")
 
-    process_button = st.sidebar.button("Process Podcast Feed")
-    st.sidebar.markdown("**Note**: 30 minutes Podcast processing takes around a minute, \
-                        because this project is using a 70x faster whisperX model. \
-                        After processing the podcast, the select box will be updated immediately, \
-                        following that, summary of the processed podcast will be shown.")
+    process_button = st.sidebar.button(":heavy_check_mark: Process Podcast Feed")
+     
+    st.sidebar.markdown("**Note**: Processing a 30-minute podcast takes about a minute \
+                        due to the 70x faster whisper model called WhisperX used in this project. \
+                        Once processing is done, the select box updates instantly, \
+                        displaying the summary of the podcast."
+                        )
 
     if process_button:
         
         # Call the function to process the URLs and retrieve podcast guest information
         podcast_info = process_podcast_info(url)
+        
+        if podcast_info["podcast_summary"] == "" or \
+           podcast_info["podcast_highlights"] == "":
+            st.error("Error processing RSS URL.\n \
+                     Most likely, the podcast episode you are trying to process is quite lengthy. \
+                     Currently, we support extracting summaries for podcasts that are shorter than 1 hour. \
+                     Please select a different podcast with episodes lasting under an hour.")
             
         # Update the dropdown with the processed podcast title
         new_podcast_name = get_next_available_name(available_podcast_info)

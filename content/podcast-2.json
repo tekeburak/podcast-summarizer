@@ -9,8 +9,11 @@
     "podcast_guest": {
         "name": "Jonathan Fieve",
         "job": "CEO of Carnegie Clean Energy",
-        "summary": "",
-        "URL": "https://www.carnegiece.com/portfolio/jonathan-fievez/"
+        "wiki_title": "",
+        "wiki_summary": "",
+        "wiki_url": "",
+        "wiki_img": "",
+        "google_URL": "https://www.carnegiece.com/portfolio/jonathan-fievez/"
     },
     "podcast_highlights": "- Highlight 1 of the podcast: \"For the first time, they managed to get more energy out of fusing two atoms together than it took to run the process, an event known as ignition.\"\n- Highlight 2 of the podcast: \"In 2023, on average, we use 60 kilowatt hours of electrical energy each, per day. That's enough to boil approximately 600 liters of water, or about 160 gallons.\"\n- Highlight 3 of the podcast: \"Biomass, farm waste included, really is a huge provider of energy. And in the UK alone, burning biomass supplies 40% of renewable energy generation and 5% of total US production.\"\n- Highlight 4 of the podcast: \"You know, I think we've all been hearing a lot about hydrogen recently. Clean fuel, great potential. Well, we can get hydrogen from biomass.\"\n- Highlight 5 of the podcast: \"We're expecting to deploy as part of the EuropeWave program in a couple of years time. And so in parallel to that, we're developing some commercial project plans.\""
 }

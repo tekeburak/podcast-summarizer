@@ -103,6 +103,13 @@ def get_transcribe_podcast(rss_url, local_path):
 @stub.function(image=podcast_image, secret=modal.Secret.from_name("my-openai-secret"))
 def get_podcast_summary(podcast_transcript):
   import openai
+  # Check token size
+  import tiktoken
+  enc = tiktoken.encoding_for_model("gpt-3.5-turbo-16k")
+  num_tokens = len(enc.encode(podcast_transcript))
+  if num_tokens >= 16385:
+    return ""
+  
   instructPrompt = """
   You are an expert copywriter who is responsible for publishing newsletters with thousands of subscribers. You recently listened to a great podcast
   and want to share a summary of it with your readers. Please write the summary of this podcast making sure to cover the important aspects that were
@@ -128,20 +135,9 @@ def get_podcast_guest(podcast_transcript):
   from googlesearch import search
 
   request = podcast_transcript[:15000] # first 15k characters
-
-  # Check token size
-  import tiktoken
-  enc = tiktoken.encoding_for_model("gpt-3.5-turbo")
-  num_tokens = len(enc.encode(request))
-  if num_tokens < 4096:
-    model_name = "gpt-3.5-turbo"
-  elif num_tokens < 16385 and num_tokens > 4096:
-    model_name = "gpt-3.5-turbo-16k"
-  else:
-    model_name = ""
-
+  
   completion = openai.ChatCompletion.create(
-    model=model_name,
+    model="gpt-3.5-turbo-16k",
     messages=[{"role": "user", "content": request}],
     max_tokens=128,
     functions=[
@@ -180,7 +176,10 @@ def get_podcast_guest(podcast_transcript):
   if podcast_guest_job is None:
     podcast_guest_job = ""
 
-  query = podcast_guest + podcast_guest_job
+  query = '%s %s' % (podcast_guest, podcast_guest_job)
+  
+  wiki_title, wiki_summary, wiki_url, wiki_img = get_wiki_info(query)
+  
   search_results = []
   try:
     for response in search(query):
@@ -188,29 +187,26 @@ def get_podcast_guest(podcast_transcript):
   except:
     search_results[0] = ""
 
-  podcast_guest_info = ""
-
-  try:
-    input = wikipedia.page(podcast_guest, auto_suggest=False)
-  except:
-    podcast_guest_info = None
-
-  if podcast_guest_info is None:
-    podcast_guest_info = ""
-  else:
-    podcast_guest_info = input.summary
-
   podcastGuest = {}
   podcastGuest['name'] = podcast_guest
   podcastGuest['job'] = podcast_guest_job
-  podcastGuest['summary'] = podcast_guest_info
-  podcastGuest['URL'] = search_results[0]
+  podcastGuest['wiki_title'] = wiki_title
+  podcastGuest['wiki_summary'] = wiki_summary
+  podcastGuest['wiki_url'] = wiki_url
+  podcastGuest['wiki_img'] = wiki_img
+  podcastGuest['google_URL'] = search_results[0]
 
   return podcastGuest
 
 @stub.function(image=podcast_image, secret=modal.Secret.from_name("my-openai-secret"))
 def get_podcast_highlights(podcast_transcript):
   import openai
+  # Check token size
+  import tiktoken
+  enc = tiktoken.encoding_for_model("gpt-3.5-turbo-16k")
+  num_tokens = len(enc.encode(podcast_transcript))
+  if num_tokens >= 16385:
+    return ""
   instructPrompt = """
   You are a podcast editor and producer. You help audience to understand the podcast deeply.
   You are provided with the transcript of a podcast episode and have to identify the 5 most significant moments in the podcast as highlights.
@@ -249,6 +245,30 @@ def process_podcast(url, path):
   output['podcast_guest'] = podcast_guest
   output['podcast_highlights'] = podcast_highlights
   return output
+
+def get_wiki_info(search_term):
+  import wikipedia
+  import requests
+  import json
+
+  try:
+    print ("Searching Wikipedia for guest...")
+    result = wikipedia.search(search_term, results = 1)
+    wikipedia.set_lang('en')
+    wkpage = wikipedia.WikipediaPage(title = result[0])
+    title = wkpage.title
+    url = wkpage.url
+    summary = wkpage.summary
+    response  = requests.get('http://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles='+title)
+    json_data = json.loads(response.text)
+    try:
+      img_link = list(json_data['query']['pages'].values())[0]['original']['source']
+    except:
+      img_link = ""
+    return (title, summary, url, img_link)
+
+  except:
+      return ("", "", "", "")
 
 @stub.local_entrypoint()
 def test_method(url, path):
