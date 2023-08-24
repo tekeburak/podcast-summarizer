@@ -131,7 +131,7 @@ def create_dict_from_json_files(folder_path):
 
 def process_podcast_info(url):
     f = modal.Function.lookup("podcast-project", "process_podcast")
-    output = f.call(url, '/tmp/podcast/')
+    output = f.remote(url, '/tmp/podcast/')
     return output
 
 def get_next_available_name(existing_podcasts):

@@ -105,7 +105,7 @@ def get_podcast_summary(podcast_transcript):
   import openai
   # Check token size
   import tiktoken
-  enc = tiktoken.encoding_for_model("gpt-3.5-turbo-16k")
+  enc = tiktoken.encoding_for_model("gpt-3.5-turbo-16k-0613")
   num_tokens = len(enc.encode(podcast_transcript))
   if num_tokens >= 16385:
     return ""
@@ -113,16 +113,18 @@ def get_podcast_summary(podcast_transcript):
   instructPrompt = """
   You are an expert copywriter who is responsible for publishing newsletters with thousands of subscribers. You recently listened to a great podcast
   and want to share a summary of it with your readers. Please write the summary of this podcast making sure to cover the important aspects that were
-  discussed. You always need to get the podcast summary. Always continue extracting for the transcript of the podcast I provide below and please keep it concise.
+  discussed. Do not include introductions and sponsorship details.Readers want to know the outlines of the topic being covered.
+  You always need to get the podcast summary. Always continue extracting for the transcript of the podcast I provide below.
+  Please keep it concise and meaningful.
   The transcript of the podcast is provided below.\n
   """
   request = instructPrompt + podcast_transcript
 
-  chatOutput = openai.ChatCompletion.create(model="gpt-3.5-turbo-16k",
+  chatOutput = openai.ChatCompletion.create(model="gpt-3.5-turbo-16k-0613",
                                             messages=[{"role": "system", "content": "You are a helpful assistant."},
                                                       {"role": "user", "content": request}
                                                       ],
-                                            max_tokens=128
+                                            max_tokens=256
                                             )
   podcastSummary = chatOutput.choices[0].message.content
   return podcastSummary
@@ -137,9 +139,9 @@ def get_podcast_guest(podcast_transcript):
   request = podcast_transcript[:15000] # first 15k characters
   
   completion = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo-16k",
+    model="gpt-3.5-turbo-16k-0613",
     messages=[{"role": "user", "content": request}],
-    max_tokens=128,
+    max_tokens=256,
     functions=[
     {
         "name": "get_podcast_guest_information",
@@ -203,7 +205,7 @@ def get_podcast_highlights(podcast_transcript):
   import openai
   # Check token size
   import tiktoken
-  enc = tiktoken.encoding_for_model("gpt-3.5-turbo-16k")
+  enc = tiktoken.encoding_for_model("gpt-3.5-turbo-16k-0613")
   num_tokens = len(enc.encode(podcast_transcript))
   if num_tokens >= 16385:
     return ""
@@ -214,21 +216,24 @@ def get_podcast_highlights(podcast_transcript):
   - Each highlight has to be impactful and an important takeaway from this podcast episode
   - Each highlight must be concise and make listeners want to hear more about why the podcast guest said that
   - The highlights that you pick must be spread out throughout the episode
-
-  Provide only the highlights and nothing else. Provide the full sentence of the highlight and format it as follows -
+  
+  Provide only the highlights and nothing else. Provide the full sentence of the highlight and format it as follows:\n
   - Highlight 1 of the podcast
   - Highlight 2 of the podcast
   - Highlight 3 of the podcast
   - Highlight 4 of the podcast
   - Highlight 5 of the podcast
+  
+  The transcript of the podcast episode is below. Use the transcript in order to extract highlights.
+  Provide only the highlights and nothing else. Do not include your sentence, only the highlights.\n
   """
 
   request = instructPrompt + podcast_transcript
-  chatOutput = openai.ChatCompletion.create(model="gpt-3.5-turbo-16k",
+  chatOutput = openai.ChatCompletion.create(model="gpt-3.5-turbo-16k-0613",
                                             messages=[{"role": "system", "content": "You are a helpful assistant."},
                                                       {"role": "user", "content": request}
                                                       ],
-                                            max_tokens=128,
+                                            max_tokens=256,
                                             )
   podcastHighlights = chatOutput.choices[0].message.content
   return podcastHighlights
@@ -236,10 +241,10 @@ def get_podcast_highlights(podcast_transcript):
 @stub.function(image=podcast_image, secret=modal.Secret.from_name("my-openai-secret"), timeout=1200)
 def process_podcast(url, path):
   output = {}
-  podcast_details = get_transcribe_podcast.call(url, path)
-  podcast_summary = get_podcast_summary.call(podcast_details['episode_transcript'])
-  podcast_guest = get_podcast_guest.call(podcast_details['episode_transcript'])
-  podcast_highlights = get_podcast_highlights.call(podcast_details['episode_transcript'])
+  podcast_details = get_transcribe_podcast.remote(url, path)
+  podcast_summary = get_podcast_summary.remote(podcast_details['episode_transcript'])
+  podcast_guest = get_podcast_guest.remote(podcast_details['episode_transcript'])
+  podcast_highlights = get_podcast_highlights.remote(podcast_details['episode_transcript'])
   output['podcast_details'] = podcast_details
   output['podcast_summary'] = podcast_summary
   output['podcast_guest'] = podcast_guest
@@ -279,7 +284,7 @@ def get_wiki_info(search_term):
 @stub.local_entrypoint()
 def test_method(url, path):
   output = {}
-  podcast_details = get_transcribe_podcast.call(url, path)
-  print ("Podcast Summary: ", get_podcast_summary.call(podcast_details['episode_transcript']))
-  print ("Podcast Guest Information: ", get_podcast_guest.call(podcast_details['episode_transcript']))
-  print ("Podcast Highlights: ", get_podcast_highlights.call(podcast_details['episode_transcript']))
+  podcast_details = get_transcribe_podcast.remote(url, path)
+  print ("Podcast Summary: ", get_podcast_summary.remote(podcast_details['episode_transcript']))
+  print ("Podcast Guest Information: ", get_podcast_guest.remote(podcast_details['episode_transcript']))
+  print ("Podcast Highlights: ", get_podcast_highlights.remote(podcast_details['episode_transcript']))
