@@ -113,8 +113,8 @@ def get_podcast_summary(podcast_transcript):
   instructPrompt = """
   You are an expert copywriter who is responsible for publishing newsletters with thousands of subscribers. You recently listened to a great podcast
   and want to share a summary of it with your readers. Please write the summary of this podcast making sure to cover the important aspects that were
-  discussed and please keep it concise.
-  The transcript of the podcast is provided below.
+  discussed. You always need to get the podcast summary. Always continue extracting for the transcript of the podcast I provide below and please keep it concise.
+  The transcript of the podcast is provided below.\n
   """
   request = instructPrompt + podcast_transcript
 
@@ -266,7 +266,13 @@ def get_wiki_info(search_term):
     except:
       img_link = ""
     return (title, summary, url, img_link)
-
+  except wikipedia.exceptions.PageError:
+    print('The page for guest does not exist on Wikipedia.')
+    return ("", "", "", "")
+  except wikipedia.exceptions.DisambiguationError as e:
+    print(f'The page for guest is ambiguous. Possible matches are:')
+    print(e.options)
+    return ("", "", "", "")
   except:
       return ("", "", "", "")
 
