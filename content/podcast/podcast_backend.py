@@ -115,7 +115,7 @@ def get_podcast_summary(podcast_transcript):
                                             messages=[{"role": "system", "content": "You are a helpful assistant."},
                                                       {"role": "user", "content": request}
                                                       ],
-                                            max_tokens=64
+                                            max_tokens=128
                                             )
   podcastSummary = chatOutput.choices[0].message.content
   return podcastSummary
@@ -143,7 +143,7 @@ def get_podcast_guest(podcast_transcript):
   completion = openai.ChatCompletion.create(
     model=model_name,
     messages=[{"role": "user", "content": request}],
-    max_tokens=64,
+    max_tokens=128,
     functions=[
     {
         "name": "get_podcast_guest_information",
@@ -182,8 +182,11 @@ def get_podcast_guest(podcast_transcript):
 
   query = podcast_guest + podcast_guest_job
   search_results = []
-  for response in search(query):
-      search_results.append(response)
+  try:
+    for response in search(query):
+        search_results.append(response)
+  except:
+    search_results[0] = ""
 
   podcast_guest_info = ""
 
@@ -229,7 +232,7 @@ def get_podcast_highlights(podcast_transcript):
                                             messages=[{"role": "system", "content": "You are a helpful assistant."},
                                                       {"role": "user", "content": request}
                                                       ],
-                                            max_tokens=64,
+                                            max_tokens=128,
                                             )
   podcastHighlights = chatOutput.choices[0].message.content
   return podcastHighlights
